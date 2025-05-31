@@ -1,0 +1,42 @@
+openapi: 3.0.0
+info:
+  title: API de Reserva de Canchas ⚽
+  description: Esta documentación corresponde al MVP de la API para gestionar usuarios, canchas y reservas.
+  version: 1.0.0
+paths:
+  /api/usuarios:
+    get:
+      tags:
+        - Usuarios
+      summary: Obtener todos los usuarios
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista de usuarios
+  /api/canchas:
+    get:
+      tags:
+        - Canchas
+      summary: Obtener todas las canchas
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista de canchas
+  /api/reservas:
+    get:
+      tags:
+        - Reservas
+      summary: Obtener todas las reservas
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Lista de reservas
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
