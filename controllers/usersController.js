@@ -35,6 +35,12 @@ exports.loginUsuario = async (req, res) => {
 };
 
 exports.getUsuarios = async (req, res) => {
+    const userRole = req.user.rol;
+
+    if (userRole !== 'admin') {
+        return res.status(403).json({ message: 'Acceso denegado: solo administradores pueden ver todos los usuarios' });
+    }
+
     try {
         const pool = await sql.connect();
         const result = await pool.request().query('SELECT id, nombre, email, rol FROM Usuarios');
@@ -45,6 +51,13 @@ exports.getUsuarios = async (req, res) => {
 };
 
 exports.getUsuarioById = async (req, res) => {
+    const userIdFromToken = req.user.id;
+    const userRole = req.user.rol;
+    const userIdFromParams = parseInt(req.params.id, 10);
+
+    if (userRole !== 'admin' && userIdFromToken !== userIdFromParams) {
+        return res.status(403).json({ message: 'Acceso denegado: no autorizado' });
+    }
     try {
         const { id } = req.params;
         const pool = await sql.connect();
@@ -60,8 +73,12 @@ exports.getUsuarioById = async (req, res) => {
 };
 
 exports.createUsuario = async (req, res) => {
+    const { nombre, email, password, rol } = req.body;    
+    const rolesPermitidos = ['jugador', 'proveedor'];
+    if (!rolesPermitidos.includes(rol)) {
+        return res.status(403).json({ message: 'Rol no permitido para registro' });
+    }
     try {
-        const { nombre, email, password, rol } = req.body;
         const passwordHash = await bcrypt.hash(password, 10);
         const pool = await sql.connect();
         await pool.request()
