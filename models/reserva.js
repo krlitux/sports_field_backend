@@ -29,7 +29,11 @@ const Reserva = sequelize.define('Reserva', {
     type: DataTypes.DATEONLY,
     allowNull: false,
   },
-  hora: {
+  hora_inicio: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  hora_fin: {
     type: DataTypes.STRING,
     allowNull: false,
   },

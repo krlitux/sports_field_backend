@@ -7,7 +7,7 @@ const authMiddleware = require('../middlewares/authMiddleware');
  * @swagger
  * tags:
  *   - name: Proveedores
- *     description: Operaciones relacionadas con proveedores (Dueños de campos de fútbol)
+ *     description: Operaciones relacionadas con proveedores (Dueños de campos deportivos)
  */
 
 /**

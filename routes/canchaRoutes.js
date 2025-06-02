@@ -83,4 +83,70 @@ router.get('/', authMiddleware, canchaController.obtenerMisCanchas);
  */
 router.delete('/:id', authMiddleware, canchaController.eliminarCancha);
 
+/**
+ * @swagger
+ * /api/canchas/{id}:
+ *   put:
+ *     summary: Editar cancha (solo proveedor)
+ *     tags: [Canchas]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         description: ID de la cancha a editar
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               nombre:
+ *                 type: string
+ *               direccion:
+ *                 type: string
+ *               tipo:
+ *                 type: string
+ *               precio:
+ *                 type: number
+ *                 format: float
+ *     responses:
+ *       200:
+ *         description: Cancha actualizada
+ *       404:
+ *         description: No se encontró la cancha o no pertenece al proveedor
+ */
+router.put('/:id', authMiddleware, soloProveedor(['proveedor']), canchaController.editarCancha);
+
+/**
+ * @swagger
+ * /api/canchas/disponibles:
+ *   get:
+ *     summary: Listar canchas disponibles (requiere autenticación)
+ *     tags: [Canchas]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: query
+ *         name: tipo
+ *         schema:
+ *           type: string
+ *         description: Filtrar por tipo de cancha 
+ *       - in: query
+ *         name: precio_max
+ *         schema:
+ *           type: number
+ *         description: Filtrar por precio máximo
+ *     responses:
+ *       200:
+ *         description: Lista de canchas disponibles
+ *       401:
+ *         description: Token requerido
+ */
+router.get('/disponibles', authMiddleware, canchaController.listarCanchasDisponibles);
+
 module.exports = router;

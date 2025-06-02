@@ -15,8 +15,8 @@ const authMiddleware = require('../middlewares/authMiddleware');
  * /api/reservas:
  *   post:
  *     summary: Crear una reserva (jugador)
- *     tags:
- *       - Reservas
+ *     description: Crea una reserva si la cancha está disponible en el horario solicitado.
+ *     tags: [Reservas]
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -25,19 +25,40 @@ const authMiddleware = require('../middlewares/authMiddleware');
  *         application/json:
  *           schema:
  *             type: object
- *             required: [cancha_id, fecha, hora]
+ *             required:
+ *               - cancha_id
+ *               - fecha
+ *               - hora_inicio
+ *               - hora_fin
  *             properties:
  *               cancha_id:
  *                 type: integer
+ *                 description: ID de la cancha a reservar
+ *                 example: 1
  *               fecha:
  *                 type: string
  *                 format: date
- *               hora:
+ *                 description: Fecha de la reserva
+ *                 example: "2025-06-01"
+ *               hora_inicio:
  *                 type: string
+ *                 format: time
+ *                 description: Hora de inicio en formato HH:mm
+ *                 example: "18:00"
+ *               hora_fin:
+ *                 type: string
+ *                 format: time
+ *                 description: Hora de fin en formato HH:mm
+ *                 example: "19:00"
  *     responses:
  *       201:
- *         description: Reserva creada
+ *         description: Reserva creada con éxito
+ *       409:
+ *         description: Ya existe una reserva en ese horario
+ *       404:
+ *         description: Cancha no encontrada
  */
+
 router.post('/', authMiddleware, reservaController.crearReserva);
 
 /**
