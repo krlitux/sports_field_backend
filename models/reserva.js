@@ -42,7 +42,9 @@ const Reserva = sequelize.define('Reserva', {
   timestamps: false,
 });
 
-Reserva.belongsTo(Cancha, { foreignKey: 'cancha_id' });
+Reserva.associate = function (models) {
+  Reserva.belongsTo(models.Cancha, { foreignKey: 'cancha_id', as: 'cancha' });
+};
 Reserva.belongsTo(Usuario, { foreignKey: 'usuario_id' });
 
 module.exports = Reserva;

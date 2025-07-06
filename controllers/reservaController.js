@@ -65,7 +65,13 @@ exports.obtenerMisReservas = async (req, res) => {
 
     const reservas = await Reserva.findAll({
       where: { usuario_id },
-      include: ['Cancha'],
+      include: [
+        {
+          model: Cancha,
+          as: 'cancha', // debe coincidir con el alias definido en el modelo
+          attributes: ['nombre']
+        }
+      ]
     });
 
     res.json(reservas);
