@@ -46,7 +46,7 @@ router.post('/', authMiddleware, soloProveedor(['proveedor']), canchaController.
 
 /**
  * @swagger
- * /api/canchas:
+ * /api/canchas/mis-canchas:
  *   get:
  *     summary: Obtener canchas del proveedor autenticado
  *     tags: 
@@ -55,9 +55,9 @@ router.post('/', authMiddleware, soloProveedor(['proveedor']), canchaController.
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Lista de canchas
+ *         description: Lista de canchas propias
  */
-router.get('/', authMiddleware, canchaController.obtenerMisCanchas);
+router.get('/mis-canchas', authMiddleware, soloProveedor(['proveedor']), canchaController.obtenerMisCanchas);
 
 /**
  * @swagger

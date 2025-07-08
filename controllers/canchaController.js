@@ -4,12 +4,13 @@ const { Op } = require('sequelize');
 exports.crearCancha = async (req, res) => {
   try {
     const proveedor_id = req.usuario.id; // extraído del token JWT
-    const { nombre, direccion, tipo } = req.body;
+    const { nombre, direccion, tipo, precio } = req.body;
 
     const cancha = await Cancha.create({
       nombre,
       direccion,
       tipo,
+      precio,  
       proveedor_id,
     });
 
