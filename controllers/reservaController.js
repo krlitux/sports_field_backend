@@ -1,5 +1,4 @@
-const Reserva = require('../models/reserva');
-const Cancha = require('../models/cancha');
+const { Reserva, Cancha, Usuario } = require('../models');
 const { Op } = require('sequelize');
 
 exports.crearReserva = async (req, res) => {
@@ -58,23 +57,30 @@ exports.crearReserva = async (req, res) => {
   }
 };
 
-
 exports.obtenerMisReservas = async (req, res) => {
   try {
     const usuario_id = req.usuario.id;
 
     const reservas = await Reserva.findAll({
-      where: { usuario_id },
-      include: [
-        {
-          model: Cancha,
-          as: 'cancha', // debe coincidir con el alias definido en el modelo
-          attributes: ['nombre']
-        }
-      ]
-    });
+    where: { usuario_id },
+    include: [
+      {
+        model: Cancha,
+        as: 'cancha',
+        attributes: ['nombre', 'direccion']
+      }
+    ],
+    raw: true,
+    nest: true,
+  });
 
-    res.json(reservas);
+  const formateadas = reservas.map(r => ({
+    ...r,
+    hora_inicio: r.hora_inicio instanceof Date ? r.hora_inicio.toTimeString().substring(0, 5) : null,
+    hora_fin: r.hora_fin instanceof Date ? r.hora_fin.toTimeString().substring(0, 5) : null,
+  }));
+
+  res.json(formateadas);
   } catch (err) {
     res.status(500).json({ mensaje: 'Error al obtener reservas', error: err.message });
   }
@@ -85,14 +91,61 @@ exports.obtenerReservasProveedor = async (req, res) => {
     const proveedor_id = req.usuario.id;
 
     const reservas = await Reserva.findAll({
-      include: {
-        model: Cancha,
-        where: { proveedor_id },
-      },
+      include: [
+        {
+          model: Cancha,
+          as: 'cancha',
+          where: { proveedor_id },
+          attributes: ['nombre', 'direccion']
+        },
+        {
+          model: Usuario,
+          as: 'usuario',
+          attributes: ['nombre']
+        }
+      ],
+      order: [['fecha', 'DESC'], ['hora_inicio', 'ASC']]
     });
 
-    res.json(reservas);
+    const resultado = reservas.map(r => ({
+      cancha: {
+        nombre: r.cancha?.nombre,     // 👈 corregido
+        direccion: r.cancha?.direccion
+      },
+      usuario: {
+        nombre: r.usuario?.nombre     // 👈 corregido
+      },
+      fecha: r.fecha,
+      hora_inicio: r.hora_inicio instanceof Date
+        ? r.hora_inicio.toTimeString().substring(0, 5)
+        : r.hora_inicio?.substring(0, 5),
+      hora_fin: r.hora_fin instanceof Date
+        ? r.hora_fin.toTimeString().substring(0, 5)
+        : r.hora_fin?.substring(0, 5),
+    }));
+
+    res.json(resultado);
   } catch (err) {
     res.status(500).json({ mensaje: 'Error al obtener reservas del proveedor', error: err.message });
+  }
+};
+
+exports.cancelarReserva = async (req, res) => {
+  try {
+    const id = req.params.id;
+    const usuarioId = req.usuario.id;
+
+    // Solo permitir cancelar si la reserva le pertenece al usuario
+    const reserva = await Reserva.findOne({ where: { id, usuario_id: usuarioId } });
+
+    if (!reserva) {
+      return res.status(404).json({ mensaje: 'Reserva no encontrada o no autorizada' });
+    }
+
+    await reserva.destroy();
+
+    res.json({ mensaje: 'Reserva cancelada exitosamente' });
+  } catch (err) {
+    res.status(500).json({ mensaje: 'Error al cancelar la reserva', error: err.message });
   }
 };

@@ -1,4 +1,4 @@
-const Cancha = require('../models/cancha');
+const { Cancha } = require('../models');
 const { Op } = require('sequelize');
 
 exports.crearCancha = async (req, res) => {
