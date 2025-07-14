@@ -1,50 +1,39 @@
-const { DataTypes } = require('sequelize');
-const sequelize = require('../config/database');
-const Cancha = require('./cancha');
-const Usuario = require('./usuario');
-
-const Reserva = sequelize.define('Reserva', {
-  id: {
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    autoIncrement: true,
-  },
-  usuario_id: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: 'Usuarios',
-      key: 'id',
+module.exports = (sequelize, DataTypes) => {
+  const Reserva = sequelize.define('Reserva', {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+      autoIncrement: true,
     },
-  },
-  cancha_id: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: 'Canchas',
-      key: 'id',
+    fecha: {
+      type: DataTypes.DATEONLY,
+      allowNull: false,
     },
-  },
-  fecha: {
-    type: DataTypes.DATEONLY,
-    allowNull: false,
-  },
-  hora_inicio: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  hora_fin: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-}, {
-  tableName: 'Reservas',
-  timestamps: false,
-});
+    hora_inicio: {
+      type: DataTypes.TIME,
+      allowNull: false,
+    },
+    hora_fin: {
+      type: DataTypes.TIME,
+      allowNull: false,
+    },
+    usuario_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    cancha_id: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    }
+  }, {
+    tableName: 'Reservas',
+    timestamps: false,
+  });
 
-Reserva.associate = function (models) {
-  Reserva.belongsTo(models.Cancha, { foreignKey: 'cancha_id', as: 'cancha' });
+  Reserva.associate = (models) => {
+    Reserva.belongsTo(models.Cancha, { foreignKey: 'cancha_id', as: 'cancha' });
+    Reserva.belongsTo(models.Usuario, { foreignKey: 'usuario_id', as: 'usuario' });
+  };
+
+  return Reserva;
 };
-Reserva.belongsTo(Usuario, { foreignKey: 'usuario_id' });
-
-module.exports = Reserva;

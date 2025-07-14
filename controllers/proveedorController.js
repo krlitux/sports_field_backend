@@ -1,6 +1,6 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const Proveedor = require('../models/proveedor');
+const { Proveedor } = require('../models');
 
 exports.registrarProveedor = async (req, res) => {
   const { razon_social, email, contraseña } = req.body;
